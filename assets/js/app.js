@@ -131,4 +131,55 @@ function onSubmit(eve) {
 }
 
 
+
+
+function deleteStd(ele) {
+    let deleteId = ele.closest('tr').id;
+    // cl(deleteId)
+
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            showSpinner()
+
+            let delete_url = `${STD_URL}`
+            let xhr = new XMLHttpRequest();
+
+            xhr.open("DELETE", delete_url, true)
+
+            xhr.send(null)
+
+            xhr.onload = function () {
+                if (xhr.status >= 200 && xhr.status <= 299) {
+                    let res = JSON.parse(xhr.response)
+
+                    ele.closest('tr').remove();
+
+                    snackbar(`student with id ${deleteId} deleted successfully`, 'success')
+
+                    let trs = document.querySelectorAll('#stdContainer tr td:first-child')
+                    trs.forEach((e, i) => { e.innerText = i + 1 })
+                } else {
+                    snackbar('something went wrong while deleting the student', 'error')
+                }
+                hideSpinner()
+            }
+
+            xhr.onerror = function () {
+                hideSpinner()
+                snackbar('Error while deleting', 'error')
+            }
+        }
+    });
+}
+
+
+
 stdForm.addEventListener('submit', onSubmit)

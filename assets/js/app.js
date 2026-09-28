@@ -11,33 +11,33 @@ const stdContainer = document.getElementById('stdContainer')
 const spinner = document.getElementById('spinner')
 
 
-const STD_URL ='https://xhrcurd-default-rtdb.asia-southeast1.firebasedatabase.app/'
-const STUD_URL =`${STD_URL}/students.json`
+const STD_URL = 'https://xhrcurd-default-rtdb.asia-southeast1.firebasedatabase.app'
+const STUD_URL = `${STD_URL}/students.json`
 
-let stdudentsArr =[]
+let stdudentsArr = []
 
-function snackbar(msg,icon){
+function snackbar(msg, icon) {
     Swal.fire({
-        title:msg,
-        icon:icon,
-        timer:3000
+        title: msg,
+        icon: icon,
+        timer: 3000
     })
 }
 
-function showSpinner(){
+function showSpinner() {
     spinner.classList.remove('d-none')
 }
 
-function hideSpinner(){
+function hideSpinner() {
     spinner.classList.add('d-none')
 }
 
 //read
 
-function oncreateStd(arr){
+function oncreateStd(arr) {
     let result = ``
-    arr.forEach((ele,i)=>{
-        result +=`
+    arr.forEach((ele, i) => {
+        result += `
              <tr id="${ele.id}">
                                     <td>${i + 1}</td>
                                     <td>${ele.fname}</td>
@@ -51,25 +51,84 @@ function oncreateStd(arr){
     stdContainer.innerHTML = result
 }
 
-function readStd(){
+function readStd() {
+    showSpinner()
     let xhr = new XMLHttpRequest()
 
-    xhr.open("GET",STUD_URL,true)
+    xhr.open("GET", STUD_URL, true)
 
     xhr.send(null)
 
-    xhr.onload = function(){
-        if(xhr.status === 200){
+    xhr.onload = function () {
+        if (xhr.status === 200) {
             let res = JSON.parse(xhr.response)
-            for(const key in res){
+            for (const key in res) {
                 res[key].id = key
 
                 stdudentsArr.push(res[key])
             }
             oncreateStd(stdudentsArr)
-        }else{
+            snackbar('All students list created successfully', 'success')
+        } else {
+            snackbar('something went wrong while rendering the data', 'error')
             cl('ERROR')
         }
+        hideSpinner()
+    }
+
+    xhr.onerror = function(){
+        hideSpinner()
+        cl("ERRORR")
     }
 }
 readStd()
+
+
+function onSubmit(eve) {
+    eve.preventDefault();
+    showSpinner()
+
+    let newStd = {
+        fname: fname.value,
+        lname: lname.value,
+        email: email.value,
+        contact: contact.value
+    }
+
+    let xhr = new XMLHttpRequest();
+
+    xhr.open("POST", STUD_URL, true)
+
+    xhr.send(JSON.stringify(newStd))
+
+    xhr.onload = function () {
+        if (xhr.status >= 200 && xhr.status <= 299) {
+            let res = JSON.parse(xhr.response)
+            stdForm.reset()
+
+            let tr = document.createElement('tr')
+            tr.id = res.id
+            tr.innerHTML = `<td>${stdudentsArr.length}</td>
+                                    <td>${newStd.fname}</td>
+                                    <td>${newStd.lname}</td>
+                                    <td>${newStd.email}</td>
+                                    <td>${newStd.contact}</td>
+                                    <td><button onClick="editStd(this)" class="btn btn-sm btn-outline-primary" type="button">Edit</button></td>
+                                    <td><button onClick="deleteStd(this)" class="btn btn-sm btn-outline-danger" type="button">Remove</button></td>`
+            stdContainer.append(tr)
+
+            snackbar(`New student with name ${newStd.fname} ${newStd.lname} created successfully`, 'success')
+        } else {
+            snackbar('something went wrong while creating new student', 'success')
+        }
+        hideSpinner()
+    }
+
+    xhr.onerror = function () {
+        hideSpinner()
+        cl("ERROR")
+    }
+}
+
+
+stdForm.addEventListener('submit', onSubmit)

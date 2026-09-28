@@ -11,34 +11,32 @@ const stdContainer = document.getElementById('stdContainer')
 const spinner = document.getElementById('spinner')
 
 
-const STD_URL ='https://xhrcurd-default-rtdb.asia-southeast1.firebasedatabase.app/'
-const STUD_URL =`${STD_URL}/students.json`
+const STD_URL = 'https://xhrcurd-default-rtdb.asia-southeast1.firebasedatabase.app/'
+const STUD_URL = `${STD_URL}/students.json`
 
-let stdudentsArr =[]
+let stdudentsArr = []
 
-function snackbar(msg,icon){
+function snackbar(msg, icon) {
     Swal.fire({
-        title:msg,
-        icon:icon,
-        timer:3000
+        title: msg,
+        icon: icon,
+        timer: 3000
     })
 }
 
-function showSpinner(){
+function showSpinner() {
     spinner.classList.remove('d-none')
 }
 
-function hideSpinner(){
+function hideSpinner() {
     spinner.classList.add('d-none')
 }
 
-//read
-
-function oncreateStd(arr){
+function oncreateStd(arr) {
     let result = ``
-    arr.forEach((ele,i)=>{
-        result +=`
-             <tr id="${ele.id}">
+    arr.forEach((ele, i) => {
+        result += `
+                                <tr id="${ele.id}">
                                     <td>${i + 1}</td>
                                     <td>${ele.fname}</td>
                                     <td>${ele.lname}</td>
@@ -50,26 +48,107 @@ function oncreateStd(arr){
     });
     stdContainer.innerHTML = result
 }
+//========================== Read ====================================
 
-function readStd(){
+function readStd() {
     let xhr = new XMLHttpRequest()
 
-    xhr.open("GET",STUD_URL,true)
+    xhr.open("GET", STUD_URL, true)
 
     xhr.send(null)
 
-    xhr.onload = function(){
-        if(xhr.status === 200){
+    xhr.onload = function () {
+        if (xhr.status === 200) {
             let res = JSON.parse(xhr.response)
-            for(const key in res){
+            for (const key in res) {
                 res[key].id = key
-
                 stdudentsArr.push(res[key])
             }
             oncreateStd(stdudentsArr)
-        }else{
+        } else {
             cl('ERROR')
         }
     }
 }
 readStd()
+
+//========================== Edit ====================================
+function editStd(ele) {
+    let EDIT_ID = ele.closest("tr").id;
+    localStorage.setItem("EDIT_ID", EDIT_ID)
+    let EDIT_URL = `${STD_URL}/students/${EDIT_ID}.json`
+    let xhr = new XMLHttpRequest()
+    xhr.open("GET", EDIT_URL)
+    xhr.send(null)
+    xhr.onload = function () {
+        if (xhr.status >= 200 && xhr.status <= 299) {
+            let res = JSON.parse(xhr.response)
+            // cl(res)
+            fname.value = res.fname
+            lname.value = res.lname
+            email.value = res.email
+            contact.value = res.contact
+
+            addstdBtn.classList.add("d-none")
+            updatestdBtn.classList.remove("d-none")
+        } else {
+
+        }
+    }
+}
+//========================== Update ====================================
+function updateStudent(ele) {
+    let UPDATE_ID = localStorage.getItem("EDIT_ID")
+
+    let UPDATE_URL = `${STD_URL}/students/${UPDATE_ID}.json`
+
+    let updatedObj = {
+        fname: fname.value,
+        lname: lname.value,
+        contact: contact.value,
+        email: email.value,
+        id: UPDATE_ID
+    }
+
+    let getIndex = stdudentsArr.findIndex(ele => ele.id === UPDATE_ID)
+    stdudentsArr[getIndex] = updatedObj;
+
+    let xhr = new XMLHttpRequest();
+    xhr.open("PATCH", UPDATE_URL);
+    xhr.send(JSON.stringify(updatedObj))
+    xhr.onload = function () {
+        if (xhr.status >= 200 && xhr.status <= 299) {
+            let res = JSON.parse(xhr.response)
+
+            document.getElementById(UPDATE_ID).innerHTML = ` <td>${getIndex + 1}</td>
+                                    <td>${updatedObj.fname}</td>
+                                    <td>${updatedObj.lname}</td>
+                                    <td>${updatedObj.email}</td>
+                                    <td>${updatedObj.contact}</td>
+                                    <td><button onClick="editStd(this)" class="btn btn-sm btn-outline-primary" type="button">Edit</button></td>
+                                    <td><button onClick="deleteStd(this)" class="btn btn-sm btn-outline-danger" type="button">Remove</button></td>`
+                                    addstdBtn.classList.remove("d-none")
+                                    updatestdBtn.classList.add("d-none")
+
+                                    stdForm.reset()
+        } else {
+            cl("Something went wrong")
+        }
+    }
+}
+
+updatestdBtn.addEventListener("click", updateStudent)
+
+
+
+
+
+
+
+
+
+
+
+
+
+

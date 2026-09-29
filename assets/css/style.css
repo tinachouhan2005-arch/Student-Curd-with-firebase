@@ -4,7 +4,6 @@
     box-sizing: border-box;
 }
 
-
 body{
     position: relative;
     /* min-height: 100vh; */
@@ -37,8 +36,6 @@ body::before{
     left: 0;
     height: 100%;
     width: 100%;
-    
-
 }
 
 .spinner{
@@ -52,9 +49,7 @@ body::before{
     display: flex;
     background-color: rgb(255,255,255,.8);
 }
-/* .card-body , .card-header, .card-footer{
-    border: 2px solid black;
-} */
+
 .tablecol{
     background-color: rgb(183, 215, 237);
     text-align: center;

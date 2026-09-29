@@ -9,7 +9,7 @@ const addstdBtn = document.getElementById('addstdBtn')
 const updatestdBtn = document.getElementById('updatestdBtn')
 const stdContainer = document.getElementById('stdContainer')
 const spinner = document.getElementById('spinner')
-
+                                            
 
 const STD_URL =  'https://xhrcurd-default-rtdb.asia-southeast1.firebasedatabase.app'
 const STUD_URL =  `${STD_URL}/students.json`
@@ -71,8 +71,6 @@ function readStd() {
             snackbar('All students list created successfully', 'success')
         } else {
             snackbar('something went wrong while rendering the data', 'error')
-        } else {
-            cl('ERROR')
         }
     }
 }

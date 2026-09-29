@@ -52,6 +52,7 @@ function oncreateStd(arr) {
 
 function readStd() {
     let xhr = new XMLHttpRequest()
+    showSpinner()
 
     xhr.open("GET", STUD_URL, true)
 
@@ -65,7 +66,9 @@ function readStd() {
                 stdudentsArr.push(res[key])
             }
             oncreateStd(stdudentsArr)
+            hideSpinner()
         } else {
+            hideSpinner()
             cl('ERROR')
         }
     }
@@ -78,6 +81,7 @@ function editStd(ele) {
     localStorage.setItem("EDIT_ID", EDIT_ID)
     let EDIT_URL = `${STD_URL}/students/${EDIT_ID}.json`
     let xhr = new XMLHttpRequest()
+    showSpinner()
     xhr.open("GET", EDIT_URL)
     xhr.send(null)
     xhr.onload = function () {
@@ -91,8 +95,10 @@ function editStd(ele) {
 
             addstdBtn.classList.add("d-none")
             updatestdBtn.classList.remove("d-none")
+            hideSpinner()
         } else {
-
+            hideSpinner()
+            cl("Something Went Wrong")
         }
     }
 }
@@ -114,6 +120,7 @@ function updateStudent(ele) {
     stdudentsArr[getIndex] = updatedObj;
 
     let xhr = new XMLHttpRequest();
+    showSpinner()
     xhr.open("PATCH", UPDATE_URL);
     xhr.send(JSON.stringify(updatedObj))
     xhr.onload = function () {
@@ -127,11 +134,15 @@ function updateStudent(ele) {
                                     <td>${updatedObj.contact}</td>
                                     <td><button onClick="editStd(this)" class="btn btn-sm btn-outline-primary" type="button">Edit</button></td>
                                     <td><button onClick="deleteStd(this)" class="btn btn-sm btn-outline-danger" type="button">Remove</button></td>`
-                                    addstdBtn.classList.remove("d-none")
-                                    updatestdBtn.classList.add("d-none")
+            addstdBtn.classList.remove("d-none")
+            updatestdBtn.classList.add("d-none")
 
-                                    stdForm.reset()
+            stdForm.reset()
+            hideSpinner()
+            snackbar("Student update successfully", "success")
+
         } else {
+            hideSpinner()
             cl("Something went wrong")
         }
     }
